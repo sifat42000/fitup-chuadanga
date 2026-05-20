@@ -1,19 +1,34 @@
+"use client"
+
 import axios from 'axios';
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoIosArrowRoundForward } from "react-icons/io";
 import ProductBox from './ProductBox';
 
-const FeaturedProduct = async () => {
-    let productData = null
-    try {
-        const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/product/get-featured-product`)
-        productData = data
-    } catch (error) {
-        console.log(error)
-    }
+const FeaturedProduct = () => {
+    const [productData, setProductData] = useState(null)
+    const [loading, setLoading] = useState(true)
 
+    useEffect(() => {
+        const fetchFeatured = async () => {
+            try {
+                const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/product/get-featured-product`)
+                setProductData(data)
+            } catch (error) {
+                console.log(error)
+                setProductData(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchFeatured()
+    }, [])
+
+    if (loading) return <div className='py-8 text-center'>Loading featured products...</div>
     if (!productData) return null
+
     return (
         <section className='lg:px-32 px-4 sm:py-10'>
             <div className='flex justify-between items-center mb-5'>

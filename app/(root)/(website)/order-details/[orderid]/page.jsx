@@ -1,17 +1,41 @@
+"use client"
+
+import React, { useEffect, useState } from "react"
 import WebsiteBreadcrumb from "@/components/Application/Website/WebsiteBreadcrumb"
 import axios from "axios"
 import Image from "next/image"
 import placeholderImg from '@/public/assets/images/img-placeholder.webp'
 import Link from "next/link"
+import { useParams } from 'next/navigation'
 import { WEBSITE_PRODUCT_DETAILS } from "@/routes/WebsiteRoute"
-const OrderDetails = async ({ params }) => {
-    const { orderid } = await params
-    const { data: orderData } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/get/${orderid}`)
-    console.log(orderData)
+
+const OrderDetails = () => {
+    const { orderid } = useParams()
+    const [orderData, setOrderData] = useState(null)
+    const [loading, setLoading] = useState(true)
+
+    useEffect(() => {
+        if (!orderid) return
+        const fetchOrder = async () => {
+            try {
+                const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/orders/get/${orderid}`)
+                setOrderData(data)
+            } catch (err) {
+                console.error(err)
+                setOrderData(null)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchOrder()
+    }, [orderid])
     const breadcrumb = {
         title: 'Order Details',
         links: [{ label: 'Order Details' }]
     }
+    if (loading) return <div className="py-20 text-center">Loading...</div>
+
     return (
         <div>
             <WebsiteBreadcrumb props={breadcrumb} />

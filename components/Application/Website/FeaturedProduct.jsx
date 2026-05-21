@@ -13,10 +13,10 @@ const FeaturedProduct = () => {
     useEffect(() => {
         const fetchFeatured = async () => {
             try {
-                const { data } = await axios.get(`${process.env.NEXT_PUBLIC_API_BASE_URL}/product/get-featured-product`)
+                const { data } = await axios.get('/api/product/get-featured-product')
                 setProductData(data)
             } catch (error) {
-                console.log(error)
+                console.error('Featured products fetch error:', error)
                 setProductData(null)
             } finally {
                 setLoading(false)

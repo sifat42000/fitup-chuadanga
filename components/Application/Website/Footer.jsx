@@ -11,7 +11,7 @@ import { FaWhatsapp } from "react-icons/fa";
 import { TiSocialFacebookCircular } from "react-icons/ti";
 import { FiTwitter } from "react-icons/fi";
 
-import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP } from '@/routes/WebsiteRoute'
+import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_REGISTER, WEBSITE_SHOP, WEBSITE_CONTACT_US } from '@/routes/WebsiteRoute'
 const Footer = () => {
     return (
         <footer className='bg-gray-50 border-t'>
@@ -67,6 +67,9 @@ const Footer = () => {
                         </li>
                         <li className='mb-2 text-gray-500'>
                             <Link href="/about-us">About</Link>
+                        </li>
+                        <li className='mb-2 text-gray-500'>
+                            <Link href={WEBSITE_CONTACT_US}>Contact Us</Link>
                         </li>
                         <li className='mb-2 text-gray-500'>
                             <Link href={WEBSITE_REGISTER}>Register</Link>

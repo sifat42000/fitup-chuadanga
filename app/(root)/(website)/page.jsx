@@ -29,7 +29,7 @@ const Home = () => {
                                 width={banner1.width}
                                 height={banner1.height}
                                 alt='banner 1'
-                                className='transition-all hover:scale-110'
+                                className='w-full h-auto object-cover transition-all hover:scale-110'
                             />
                         </Link>
                     </div>
@@ -40,7 +40,7 @@ const Home = () => {
                                 width={banner2.width}
                                 height={banner2.height}
                                 alt='banner 2'
-                                className='transition-all hover:scale-110'
+                                className='w-full h-auto object-cover transition-all hover:scale-110'
                             />
                         </Link>
                     </div>
@@ -56,7 +56,7 @@ const Home = () => {
                     height={advertisingBanner.height}
                     width={advertisingBanner.width}
                     alt='Advertisement'
-
+                    className='w-full h-auto object-cover'
                 />
             </section>
 

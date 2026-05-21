@@ -37,7 +37,7 @@ const Header = () => {
                 </Link>
 
                 <div className='flex justify-between gap-20'>
-                    <nav className={`lg:relative lg:w-auto lg:h-auto lg:top-0 lg:left-0 lg:p-0 bg-white fixed z-50 top-0 w-full h-screen transition-all ${isMobileMenu ? 'left-0' : '-left-full'}`}>
+                    <nav className={`lg:relative lg:w-auto lg:h-auto lg:top-0 lg:left-0 lg:p-0 bg-white fixed z-50 top-0 left-0 w-full h-screen transition-all ${isMobileMenu ? 'translate-x-0' : '-translate-x-full'}`}>
 
 
                         <div className='lg:hidden flex justify-between items-center bg-gray-50 py-3 border-b px-3'>

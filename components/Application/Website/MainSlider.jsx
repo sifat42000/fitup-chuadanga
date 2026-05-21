@@ -55,16 +55,16 @@ const MainSlider = () => {
         <div>
             <Slider {...settings}>
                 <div>
-                    <Image src={slider1.src} width={slider1.width} height={slider1.height} alt='slider 1' />
+                    <Image src={slider1.src} width={slider1.width} height={slider1.height} alt='slider 1' className='w-full h-auto object-cover' />
                 </div>
                 <div>
-                    <Image src={slider2.src} width={slider2.width} height={slider2.height} alt='slider 2' />
+                    <Image src={slider2.src} width={slider2.width} height={slider2.height} alt='slider 2' className='w-full h-auto object-cover' />
                 </div>
                 <div>
-                    <Image src={slider3.src} width={slider3.width} height={slider3.height} alt='slider 3' />
+                    <Image src={slider3.src} width={slider3.width} height={slider3.height} alt='slider 3' className='w-full h-auto object-cover' />
                 </div>
                 <div>
-                    <Image src={slider4.src} width={slider4.width} height={slider4.height} alt='slider 4' />
+                    <Image src={slider4.src} width={slider4.width} height={slider4.height} alt='slider 4' className='w-full h-auto object-cover' />
                 </div>
             </Slider>
         </div>

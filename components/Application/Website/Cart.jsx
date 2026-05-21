@@ -49,7 +49,7 @@ const Cart = () => {
                 <BsCart2 size={25} className="text-gray-500 hover:text-primary" />
                 <span className="absolute bg-red-500 text-white text-xs rounded-full w-4 h-4 flex justify-center items-center -right-2 -top-1">{cart.count}</span>
             </SheetTrigger>
-            <SheetContent className="sm:max-w-[450px] w-full">
+            <SheetContent className="sm:max-w-[450px] w-full max-w-full box-border">
                 <SheetHeader className='py-2'>
                     <SheetTitle className="text-2xl">My Cart</SheetTitle>
                     <SheetDescription></SheetDescription>
@@ -62,12 +62,12 @@ const Cart = () => {
                         </div>}
 
                         {cart.products?.map(product => (
-                            <div key={product.variantId} className="flex justify-between items-center gap-5 mb-4 border-b pb-4">
-                                <div className="flex gap-5 items-center">
-                                    <Image src={product?.media || imgPlaceholder.src} height={100} width={100} alt={product.name} className="w-20 h-20 rounded border" />
+                            <div key={product.variantId} className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 border-b pb-4 min-w-0">
+                                <div className="flex gap-3 sm:gap-5 items-start sm:items-center min-w-0">
+                                    <Image src={product?.media || imgPlaceholder.src} height={90} width={90} alt={product.name} className="w-20 h-20 sm:w-24 sm:h-24 rounded border" />
 
-                                    <div >
-                                        <h4 className="text-lg mb-1">{product.name}</h4>
+                                    <div className='min-w-0'>
+                                        <h4 className="text-lg mb-1 line-clamp-2 truncate">{product.name}</h4>
                                         <p className="text-gray-500">
                                             {product.size}/{product.color}
                                         </p>
@@ -75,7 +75,7 @@ const Cart = () => {
 
                                 </div>
 
-                                <div>
+                                <div className='min-w-0 text-right'>
                                     <button type="button" className="text-red-500 underline underline-offset-1 mb-2 cursor-pointer"
                                         onClick={() => dispatch(removeFromCart({ productId: product.productId, variantId: product.variantId }))}
                                     >
@@ -90,15 +90,15 @@ const Cart = () => {
                             </div>
                         ))}
                     </div>
-                    <div className="h-32 border-t pt-5 px-2">
-                        <h2 className="flex justify-between items-center text-lg font-semibold"><span >Subtotal</span> <span>{subtotal?.toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</span></h2>
-                        <h2 className="flex justify-between items-center text-lg font-semibold"><span >Discount</span> <span>{discount?.toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</span></h2>
+                    <div className="min-h-[150px] border-t pt-5 px-2 box-border">
+                        <h2 className="flex justify-between items-center text-lg font-semibold"><span>Subtotal</span> <span>{subtotal?.toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</span></h2>
+                        <h2 className="flex justify-between items-center text-lg font-semibold"><span>Discount</span> <span>{discount?.toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</span></h2>
 
-                        <div className="flex justify-between mt-3 gap-5">
-                            <Button type="button" asChild variant="secondary" className="w-[200px]" onClick={() => setOpen(false)}>
+                        <div className="grid grid-cols-2 gap-3 mt-3 sm:grid-cols-2">
+                            <Button type="button" asChild variant="secondary" className="w-full min-w-0" onClick={() => setOpen(false)}>
                                 <Link href={WEBSITE_CART}>View Cart</Link>
                             </Button>
-                            <Button type="button" asChild className="w-[200px]" onClick={() => setOpen(false)}>
+                            <Button type="button" asChild className="w-full min-w-0" onClick={() => setOpen(false)}>
                                 {cart.count ?
                                     <Link href={WEBSITE_CHECKOUT}>Checkout</Link>
                                     :

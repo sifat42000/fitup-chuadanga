@@ -41,7 +41,7 @@ const CartPage = () => {
             <WebsiteBreadcrumb props={breadCrumb} />
             {cart.count === 0
                 ?
-                <div className='w-screen h-[500px] flex justify-center items-center py-32'>
+                <div className='w-full h-[500px] box-border flex justify-center items-center py-32'>
                     <div className='text-center'>
                         <h4 className='text-4xl font-semibold mb-5'>Your cart is empty!</h4>
 
@@ -52,8 +52,8 @@ const CartPage = () => {
                     </div>
                 </div>
                 :
-                <div className='flex lg:flex-nowrap flex-wrap gap-10 my-20 lg:px-32 px-4'>
-                    <div className='lg:w-[70%] w-full'>
+                <div className='flex lg:flex-nowrap flex-wrap gap-10 my-20 lg:px-32 px-4 max-w-full box-border overflow-x-hidden'>
+                    <div className='lg:w-[70%] w-full min-w-0'>
                         <table className='w-full border'>
                             <thead className='border-b bg-gray-50 md:table-header-group hidden'>
                                 <tr>
@@ -66,12 +66,12 @@ const CartPage = () => {
                             </thead>
                             <tbody>
                                 {cart.products.map(product => (
-                                    <tr key={product.variantId} className='md:table-row block border-b'>
-                                        <td className='p-3'>
-                                            <div className='flex items-center gap-5'>
-                                                <Image src={product.media || imgPlaceholder.src} width={60} height={60} alt={product.name} />
-                                                <div>
-                                                    <h4 className='text-lg font-medium line-clamp-1'>
+                                    <tr key={product.variantId} className='md:table-row block border-b min-w-0'>
+                                        <td className='p-3 min-w-0'>
+                                            <div className='flex items-center gap-3 sm:gap-5 min-w-0'>
+                                                <Image src={product.media || imgPlaceholder.src} width={60} height={60} alt={product.name} className='min-w-0' />
+                                                <div className='min-w-0'>
+                                                    <h4 className='text-lg font-medium line-clamp-1 truncate'>
                                                         <Link href={WEBSITE_PRODUCT_DETAILS(product.url)}>
                                                             {product.name}
                                                         </Link>
@@ -82,22 +82,22 @@ const CartPage = () => {
                                             </div>
                                         </td>
 
-                                        <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center'>
+                                        <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center min-w-0'>
                                             <span className='md:hidden font-medium'>Price</span>
-                                            <span>
+                                            <span className='min-w-0'>
                                                 {product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
                                             </span>
                                         </td>
-                                        <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2'>
+                                        <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2 min-w-0'>
                                             <span className='md:hidden font-medium'>Quantity</span>
-                                            <div className='flex justify-center'>
-                                                <div className="flex justify-center items-center md:h-10 h-7 border w-fit rounded-full">
+                                            <div className='flex justify-center min-w-0'>
+                                                <div className="flex justify-center items-center md:h-10 h-7 border w-fit rounded-full min-w-0">
 
-                                                    <button type="button" className="h-full w-10 flex justify-center items-center cursor-pointer" onClick={() => dispatch(decreaseQuantity({ productId: product.productId, variantId: product.variantId }))}>
+                                                    <button type="button" className="h-full w-9 flex justify-center items-center cursor-pointer" onClick={() => dispatch(decreaseQuantity({ productId: product.productId, variantId: product.variantId }))}>
                                                         <HiMinus />
                                                     </button>
-                                                    <input type="text" value={product.qty} className="md:w-14 w-8  text-center border-none outline-offset-0" readOnly />
-                                                    <button type="button" className="h-full w-10 flex justify-center items-center cursor-pointer"
+                                                    <input type="text" value={product.qty} className="md:w-14 w-10 text-center border-none outline-offset-0" readOnly />
+                                                    <button type="button" className="h-full w-9 flex justify-center items-center cursor-pointer"
                                                         onClick={() => dispatch(increaseQuantity({ productId: product.productId, variantId: product.variantId }))}
                                                     >
                                                         <HiPlus />
@@ -107,7 +107,7 @@ const CartPage = () => {
 
                                             </div>
                                         </td>
-                                        <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center'>
+                                        <td className='md:table-cell flex justify-between md:p-3 px-3 pb-2 text-center min-w-0'>
                                             <span className='md:hidden font-medium'>Total</span>
                                             <span>
                                                 {(product.sellingPrice * product.qty).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}

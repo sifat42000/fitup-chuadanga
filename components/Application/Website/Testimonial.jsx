@@ -1,74 +1,47 @@
 'use client'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
 import { IoStar } from "react-icons/io5";
 import { BsChatQuote } from "react-icons/bs";
-
-
-const testimonials = [
-    {
-        name: "Sophia Patel",
-        review: "This product exceeded my expectations. The quality is top-notch and it arrived much faster than I anticipated. I will definitely be recommending it to my friends and family.",
-        rating: 5
-    },
-    {
-        name: "James Thompson",
-        review: "Customer service was extremely helpful and responsive. They guided me through every step of the process. I'm very satisfied with the support I received.",
-        rating: 4
-    },
-    {
-        name: "Emily Chen",
-        review: "I’ve been using this service for over a month now and it’s been amazing. The user interface is intuitive and everything runs smoothly. I haven’t faced any major issues so far.",
-        rating: 5
-    },
-    {
-        name: "Liam Rodriguez",
-        review: "Honestly, I was skeptical at first, but it turned out great. The features offered are well worth the price. There is room for improvement, but overall I’m happy with it.",
-        rating: 4
-    },
-    {
-        name: "Ava Johnson",
-        review: "The attention to detail is impressive. From packaging to performance, everything was handled professionally. I feel like I got great value for my money.",
-        rating: 5
-    },
-    {
-        name: "Noah Davis",
-        review: "There were a few hiccups during setup, but the documentation helped a lot. Once everything was in place, it worked flawlessly. I'm a satisfied customer now.",
-        rating: 4
-    },
-    {
-        name: "Isabella Martinez",
-        review: "What stood out the most was how easy it was to get started. The onboarding process is smooth and well thought out. I appreciated the thoughtful design.",
-        rating: 5
-    },
-    {
-        name: "William Lee",
-        review: "It does what it promises, no complaints there. The pricing is fair and the customer experience is excellent. I’ll be coming back for future purchases.",
-        rating: 4
-    },
-    {
-        name: "Mia Anderson",
-        review: "I encountered a few bugs in the beginning, but support helped fix them quickly. Now everything works perfectly. The team really listens to feedback.",
-        rating: 4
-    },
-    {
-        name: "Ethan Clark",
-        review: "This has been one of the best investments I’ve made recently. The performance is consistent and it integrates seamlessly with my workflow. Highly recommended!",
-        rating: 5
-    }
-];
-
+import axios from 'axios'
+import Image from 'next/image'
 
 
 const Testimonial = () => {
+    const [testimonials, setTestimonials] = useState([])
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(null)
+
+    useEffect(() => {
+        fetchTestimonials()
+    }, [])
+
+    const fetchTestimonials = async () => {
+        try {
+            setLoading(true)
+            setError(null)
+            const response = await axios.get('/api/testimonials?limit=10')
+            
+            if (response.data.success) {
+                setTestimonials(response.data.data.reviews || [])
+            } else {
+                setError(response.data.message || 'Failed to fetch testimonials')
+            }
+        } catch (err) {
+            setError(err.message || 'Error fetching testimonials')
+            console.error('Testimonials fetch error:', err)
+        } finally {
+            setLoading(false)
+        }
+    }
 
     const settings = {
         dots: true,
-        infinite: true,
+        infinite: testimonials.length > 1,
         speed: 500,
-        autoplay: true,
+        autoplay: testimonials.length > 1,
         slidesToShow: 3,
         slidesToScroll: 1,
         responsive: [
@@ -78,7 +51,7 @@ const Testimonial = () => {
                     slidesToShow: 2,
                     slidesToScroll: 1,
                     dots: true,
-                    infinite: true,
+                    infinite: testimonials.length > 1,
                 }
             },
             {
@@ -93,23 +66,110 @@ const Testimonial = () => {
         ]
     }
 
+    // Loading State
+    if (loading) {
+        return (
+            <div className='lg:px-32 px-4 sm:pt-20 pt-5 pb-10'>
+                <h2 className='text-center sm:text-4xl text-2xl mb-5 font-semibold'>Customer Review</h2>
+                <div className='grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 gap-5'>
+                    {[1, 2, 3].map((item) => (
+                        <div key={item} className='border rounded-lg p-5 animate-pulse'>
+                            <div className='h-6 w-6 bg-gray-300 rounded mb-3'></div>
+                            <div className='space-y-2 mb-5'>
+                                <div className='h-4 bg-gray-300 rounded w-full'></div>
+                                <div className='h-4 bg-gray-300 rounded w-5/6'></div>
+                                <div className='h-4 bg-gray-300 rounded w-4/6'></div>
+                            </div>
+                            <div className='h-4 bg-gray-300 rounded w-32 mb-2'></div>
+                            <div className='flex gap-1'>
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <div key={star} className='h-5 w-5 bg-gray-300 rounded'></div>
+                                ))}
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+        )
+    }
+
+    // Error State
+    if (error) {
+        return (
+            <div className='lg:px-32 px-4 sm:pt-20 pt-5 pb-10'>
+                <h2 className='text-center sm:text-4xl text-2xl mb-5 font-semibold'>Customer Review</h2>
+                <div className='border border-red-200 bg-red-50 rounded-lg p-8 text-center'>
+                    <p className='text-red-700 mb-4'>Unable to load customer reviews</p>
+                    <p className='text-red-600 text-sm mb-4'>{error}</p>
+                    <button
+                        onClick={fetchTestimonials}
+                        className='bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded'
+                    >
+                        Try Again
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
+    // Empty State
+    if (!testimonials || testimonials.length === 0) {
+        return (
+            <div className='lg:px-32 px-4 sm:pt-20 pt-5 pb-10'>
+                <h2 className='text-center sm:text-4xl text-2xl mb-5 font-semibold'>Customer Review</h2>
+                <div className='border border-gray-200 rounded-lg p-12 text-center'>
+                    <BsChatQuote size={48} className='mx-auto mb-4 text-gray-400' />
+                    <p className='text-gray-600 text-lg'>No customer reviews available yet.</p>
+                    <p className='text-gray-500 text-sm mt-2'>Be the first to share your experience!</p>
+                </div>
+            </div>
+        )
+    }
+
     return (
         <div className='lg:px-32 px-4 sm:pt-20 pt-5 pb-10'>
             <h2 className='text-center sm:text-4xl text-2xl mb-5 font-semibold'>Customer Review</h2>
             <Slider {...settings}>
                 {testimonials.map((item, index) => (
-                    <div key={index} className="p-5">
-                        <div className='border rounded-lg p-5'>
-                            <BsChatQuote size={30} className='mb-3' />
+                    <div key={item._id || index} className="p-5">
+                        <div className='border rounded-lg p-5 h-full flex flex-col'>
+                            <BsChatQuote size={30} className='mb-3 text-gray-600' />
 
-                            <p className='mb-5'>{item.review}</p>
-                            <h4 className='font-semibold'>{item.name}</h4>
-                            <div className='flex mt-1'>
-                                {Array.from({ length: item.rating }).map((_, i) => (
-                                    <IoStar key={`star${i}`} className='text-yellow-400' size={20} />
-                                ))}
+                            <p className='mb-5 flex-grow text-gray-700'>{item.review}</p>
+                            
+                            <div className='flex items-center gap-3 mb-3'>
+                                {item.avatar?.url && (
+                                    <Image
+                                        src={item.avatar.url}
+                                        alt={item.name || 'Customer'}
+                                        width={40}
+                                        height={40}
+                                        className='w-10 h-10 rounded-full object-cover'
+                                    />
+                                )}
+                                <div className='flex-grow'>
+                                    <h4 className='font-semibold text-sm'>{item.name || 'Anonymous'}</h4>
+                                    {item.createdAt && (
+                                        <p className='text-xs text-gray-500'>
+                                            {new Date(item.createdAt).toLocaleDateString('en-US', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric'
+                                            })}
+                                        </p>
+                                    )}
+                                </div>
                             </div>
 
+                            <div className='flex gap-1 mt-auto'>
+                                {Array.from({ length: 5 }).map((_, i) => (
+                                    <IoStar 
+                                        key={`star${i}`} 
+                                        className={i < item.rating ? 'text-yellow-400' : 'text-gray-300'} 
+                                        size={18} 
+                                    />
+                                ))}
+                            </div>
                         </div>
                     </div>
                 ))}

@@ -20,10 +20,16 @@ import { IoCloseCircleSharp } from "react-icons/io5";
 import { z } from 'zod'
 import { FaShippingFast } from "react-icons/fa";
 import { Textarea } from '@/components/ui/textarea'
-import Script from 'next/script'
+// Script removed; Razorpay checkout not loaded on checkout page
 import { useRouter } from 'next/navigation'
 
 import loading from '@/public/assets/images/loading.svg'
+
+// Currency formatter for Bangladeshi Taka (display only)
+const formatBDT = (value) => {
+    const v = Number(value) || 0
+    return `৳${v.toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`
+}
 const breadCrumb = {
     title: 'Checkout',
     links: [
@@ -192,6 +198,9 @@ const Checkout = () => {
 
     const placeOrder = async (formData) => {
         setPlacingOrder(true)
+        // Force payment method to Cash on Delivery to prevent any online payment flow
+        const chosenPaymentMethod = 'cod'
+        setPaymentMethod('cod')
         try {
             const products = verifiedCartData.map((cartItem) => (
                 {
@@ -204,8 +213,8 @@ const Checkout = () => {
                 }
             ))
 
-            // Cash on Delivery
-            if (paymentMethod === 'cod') {
+            // Cash on Delivery (forced)
+            if (chosenPaymentMethod === 'cod') {
                 setSavingOrder(true)
                 const orderData = {
                     ...formData,
@@ -224,8 +233,8 @@ const Checkout = () => {
                 router.push(WEBSITE_ORDER_DETAILS(result.orderId))
                 setSavingOrder(false)
             } 
-            // Razorpay Payment
-            else if (paymentMethod === 'razorpay') {
+            // Razorpay Payment (kept for reference but bypassed in active flow)
+            else if (chosenPaymentMethod === 'razorpay') {
                 const generateOrderId = await getOrderId(totalAmount)
                 if (!generateOrderId.success) {
                     throw new Error(generateOrderId.message)
@@ -487,16 +496,6 @@ const Checkout = () => {
                                                     />
                                                     <span>Cash on Delivery (COD)</span>
                                                 </label>
-                                                <label className='flex items-center gap-2 cursor-pointer'>
-                                                    <input 
-                                                        type="radio" 
-                                                        name="paymentMethod" 
-                                                        value="razorpay" 
-                                                        checked={paymentMethod === 'razorpay'}
-                                                        onChange={(e) => setPaymentMethod(e.target.value)}
-                                                    />
-                                                    <span>Online Payment (Razorpay)</span>
-                                                </label>
                                             </div>
                                         </div>
                                     </div>
@@ -533,7 +532,7 @@ const Checkout = () => {
                                                 </td>
                                                 <td className='p-3 text-center'>
                                                     <p className='text-nowrap text-sm'>
-                                                        {product.qty} x {product.sellingPrice.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                                        {product.qty} x {formatBDT(product.sellingPrice)}
                                                     </p>
                                                 </td>
                                             </tr>
@@ -546,25 +545,25 @@ const Checkout = () => {
                                         <tr>
                                             <td className='font-medium py-2'>Subtotal</td>
                                             <td className='text-end py-2'>
-                                                {subtotal.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                                {formatBDT(subtotal)}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td className='font-medium py-2'>Discount</td>
                                             <td className='text-end py-2'>
-                                                - {discount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                                - {formatBDT(discount)}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td className='font-medium py-2'>Coupon Discount</td>
                                             <td className='text-end py-2'>
-                                                -  {couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                                -  {formatBDT(couponDiscountAmount)}
                                             </td>
                                         </tr>
                                         <tr>
                                             <td className='font-medium py-2 text-xl'>Total</td>
                                             <td className='text-end py-2'>
-                                                {totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}
+                                                {formatBDT(totalAmount)}
                                             </td>
                                         </tr>
                                     </tbody>
@@ -615,7 +614,7 @@ const Checkout = () => {
                 </div>
             }
 
-            <Script src='https://checkout.razorpay.com/v1/checkout.js' />
+            {/* Razorpay script removed from checkout page to prevent popup; backend endpoints remain unchanged */}
         </div>
     )
 }

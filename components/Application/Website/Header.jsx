@@ -2,7 +2,8 @@
 import { USER_DASHBOARD, WEBSITE_HOME, WEBSITE_LOGIN, WEBSITE_SHOP, WEBSITE_CONTACT_US } from '@/routes/WebsiteRoute'
 import Image from 'next/image'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
+import { usePathname } from 'next/navigation'
 import logo from '@/public/assets/images/logo.png'
 import { IoIosSearch } from "react-icons/io";
 import Cart from './Cart'
@@ -20,10 +21,21 @@ const Header = () => {
     const auth = useSelector(store => store.authStore.auth)
     const [isMobileMenu, setIsMobileMenu] = useState(false)
     const [showSearch, setShowSearch] = useState(false)
+    const pathname = usePathname()
+
+    // Close mobile menu when route changes
+    useEffect(() => {
+        setIsMobileMenu(false)
+    }, [pathname])
+
+    // Close mobile menu when nav link is clicked
+    const closeMobileMenu = () => {
+        setIsMobileMenu(false)
+    }
     return (
         <div className='bg-white border-b lg:px-32 px-4'>
             <div className='flex justify-between items-center lg:py-5 py-3'>
-                <Link className='flex gap-3 items-center' href={WEBSITE_HOME}>
+                <Link className='flex gap-3 items-center' href={WEBSITE_HOME} onClick={closeMobileMenu}>
                     <Image
                         src={logo}
                         width={200}
@@ -59,22 +71,22 @@ const Header = () => {
 
                         <ul className='lg:flex justify-between items-center gap-10 px-3 '>
                             <li className='text-gray-600 hover:text-primary hover:font-semibold'>
-                                <Link href={WEBSITE_HOME} className='block py-2'>
+                                <Link href={WEBSITE_HOME} className='block py-2' onClick={closeMobileMenu}>
                                     Home
                                 </Link>
                             </li>
                             <li className='text-gray-600 hover:text-primary hover:font-semibold'>
-                                <Link href="/about-us" className='block py-2'>
+                                <Link href="/about-us" className='block py-2' onClick={closeMobileMenu}>
                                     About
                                 </Link>
                             </li>
                             <li className='text-gray-600 hover:text-primary hover:font-semibold'>
-                                <Link href={WEBSITE_SHOP} className='block py-2'>
+                                <Link href={WEBSITE_SHOP} className='block py-2' onClick={closeMobileMenu}>
                                     Shop
                                 </Link>
                             </li>
                             <li className='text-gray-600 hover:text-primary hover:font-semibold'>
-                                <Link href={WEBSITE_CONTACT_US} className='block py-2'>
+                                <Link href={WEBSITE_CONTACT_US} className='block py-2' onClick={closeMobileMenu}>
                                     Contact Us
                                 </Link>
                             </li>

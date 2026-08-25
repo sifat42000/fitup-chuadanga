@@ -12,7 +12,7 @@ const orderSchema = new mongoose.Schema({
     },
     email: {
         type: String,
-        required: true
+        required: false
     },
     phone: {
         type: String,
@@ -20,7 +20,7 @@ const orderSchema = new mongoose.Schema({
     },
     country: {
         type: String,
-        required: true
+        required: false
     },
     state: {
         type: String,
@@ -33,11 +33,11 @@ const orderSchema = new mongoose.Schema({
     },
     pincode: {
         type: String,
-        required: true
+        required: false
     },
     landmark: {
         type: String,
-        required: true
+        required: false
     },
     ordernote: {
         type: String,
@@ -67,6 +67,15 @@ const orderSchema = new mongoose.Schema({
         required: true
     },
     totalAmount: {
+        type: Number,
+        required: true
+    },
+    deliveryOption: {
+        type: String,
+        enum: ['inside', 'outside'],
+        required: true
+    },
+    deliveryCharge: {
         type: Number,
         required: true
     },

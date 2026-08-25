@@ -157,6 +157,10 @@ const OrderDetails = () => {
                                                 <td className="text-end py-2">{orderData?.data?.couponDiscountAmount.toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</td>
                                             </tr>
                                             <tr>
+                                                <td className="font-medium py-2">Delivery Charge</td>
+                                                <td className="text-end py-2">{(orderData?.data?.deliveryCharge || 0).toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</td>
+                                            </tr>
+                                            <tr>
                                                 <td className="font-medium py-2">Total</td>
                                                 <td className="text-end py-2">{orderData?.data?.totalAmount.toLocaleString('en-US', { style: 'currency', currency: 'BDT' })}</td>
                                             </tr>

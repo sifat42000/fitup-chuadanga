@@ -23,13 +23,23 @@ export async function POST(request) {
 
         const baseOrderSchema = zSchema.pick({
             name: true, email: true, phone: true, country: true, state: true, city: true, pincode: true, landmark: true, ordernote: true
-        }).extend({
+        }).partial().extend({
+            name: zSchema.shape.name,
+            phone: zSchema.shape.phone,
+            state: zSchema.shape.state,
+            city: zSchema.shape.city,
+            email: zSchema.shape.email.or(z.literal('')).optional(),
+            country: zSchema.shape.country.or(z.literal('')).optional(),
+            pincode: zSchema.shape.pincode.or(z.literal('')).optional(),
+            landmark: zSchema.shape.landmark.or(z.literal('')).optional(),
             userId: z.string().optional(),
             paymentMethod: z.enum(['razorpay', 'cod']).default('razorpay'),
             subtotal: z.number().nonnegative(),
             discount: z.number().nonnegative(),
             couponDiscountAmount: z.number().nonnegative(),
             totalAmount: z.number().nonnegative(),
+            deliveryOption: z.enum(['inside', 'outside']),
+            deliveryCharge: z.number().nonnegative(),
             products: z.array(productSchema),
             razorpay_payment_id: z.string().min(3).optional(),
             razorpay_order_id: z.string().min(3).optional(),
@@ -42,6 +52,8 @@ export async function POST(request) {
         }
 
         const validatedData = validate.data
+        const deliveryCharge = validatedData.deliveryOption === 'inside' ? 40 : 120
+        const totalAmount = Math.max(0, validatedData.subtotal - validatedData.couponDiscountAmount + deliveryCharge)
         let paymentVerification = false
         let payment_id = null
         let order_id = null
@@ -83,8 +95,10 @@ export async function POST(request) {
             products: validatedData.products,
             discount: validatedData.discount,
             couponDiscountAmount: validatedData.couponDiscountAmount,
-            totalAmount: validatedData.totalAmount,
+            totalAmount,
             subtotal: validatedData.subtotal,
+            deliveryOption: validatedData.deliveryOption,
+            deliveryCharge,
             payment_id: payment_id,
             order_id: order_id,
             paymentMethod: validatedData.paymentMethod,

@@ -94,7 +94,7 @@ const RegisterPage = () => {
                                         <FormItem>
                                             <FormLabel>Full Name</FormLabel>
                                             <FormControl>
-                                                <Input type="text" placeholder="Developer goswami" {...field} />
+                                                <Input type="text" placeholder="Your Name" {...field} />
                                             </FormControl>
                                             <FormMessage />
                                         </FormItem>

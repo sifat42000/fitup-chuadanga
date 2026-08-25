@@ -190,6 +190,10 @@ const OrderDetails = ({ params }) => {
                                                     <td className="text-end py-2">{orderData?.couponDiscountAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                                 </tr>
                                                 <tr>
+                                                    <td className="font-medium py-2">Delivery Charge</td>
+                                                    <td className="text-end py-2">{(orderData?.deliveryCharge || 0).toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
+                                                </tr>
+                                                <tr>
                                                     <td className="font-medium py-2">Total</td>
                                                     <td className="text-end py-2">{orderData?.totalAmount.toLocaleString('en-IN', { style: 'currency', currency: 'INR' })}</td>
                                                 </tr>

@@ -25,6 +25,11 @@ import { useRouter } from 'next/navigation'
 
 import loading from '@/public/assets/images/loading.svg'
 
+const DELIVERY_CHARGES = {
+    inside: 40,
+    outside: 120,
+}
+
 // Currency formatter for Bangladeshi Taka (display only)
 const formatBDT = (value) => {
     const v = Number(value) || 0
@@ -51,10 +56,31 @@ const Checkout = () => {
     const [totalAmount, setTotalAmount] = useState(0)
     const [couponLoading, setCouponLoading] = useState(false)
     const [couponCode, setCouponCode] = useState('')
+    const [deliveryOption, setDeliveryOption] = useState('')
 
     const [placingOrder, setPlacingOrder] = useState(false)
     const [savingOrder, setSavingOrder] = useState(false)
     const [paymentMethod, setPaymentMethod] = useState('cod') // Default to COD
+
+    const deliveryCharge = DELIVERY_CHARGES[deliveryOption] || 0
+    const calculateTotal = (couponAmount = couponDiscountAmount, charge = deliveryCharge) =>
+        Math.max(0, subtotal - couponAmount + charge)
+
+    useEffect(() => {
+        const savedDeliveryOption = window.sessionStorage.getItem('checkoutDeliveryOption')
+        if (savedDeliveryOption && DELIVERY_CHARGES[savedDeliveryOption]) {
+            setDeliveryOption(savedDeliveryOption)
+        }
+    }, [])
+
+    useEffect(() => {
+        if (deliveryOption) {
+            window.sessionStorage.setItem('checkoutDeliveryOption', deliveryOption)
+        } else {
+            window.sessionStorage.removeItem('checkoutDeliveryOption')
+        }
+        setTotalAmount(calculateTotal(couponDiscountAmount, DELIVERY_CHARGES[deliveryOption] || 0))
+    }, [deliveryOption, subtotal, couponDiscountAmount])
     useEffect(() => {
         if (getVerifiedCartData && getVerifiedCartData.success) {
             const cartData = getVerifiedCartData.data
@@ -76,7 +102,7 @@ const Checkout = () => {
 
         setSubTotal(subTotalAmount)
         setDiscount(discount)
-        setTotalAmount(subTotalAmount)
+        setTotalAmount(subTotalAmount + (DELIVERY_CHARGES[deliveryOption] || 0) - couponDiscountAmount)
 
         couponForm.setValue('minShoppingAmount', subTotalAmount)
 
@@ -110,7 +136,7 @@ const Checkout = () => {
             const discountPercentage = response.data.discountPercentage
             // get coupon discount amount 
             setCouponDiscountAmount((subtotal * discountPercentage) / 100)
-            setTotalAmount(subtotal - ((subtotal * discountPercentage) / 100))
+            setTotalAmount(calculateTotal((subtotal * discountPercentage) / 100))
             showToast('success', response.message)
             setCouponCode(couponForm.getValues('code'))
             setIsCouponApplied(true)
@@ -127,7 +153,7 @@ const Checkout = () => {
         setIsCouponApplied(false)
         setCouponCode('')
         setCouponDiscountAmount(0)
-        setTotalAmount(subtotal)
+        setTotalAmount(calculateTotal(0))
     }
 
 
@@ -142,7 +168,18 @@ const Checkout = () => {
         pincode: true,
         landmark: true,
         ordernote: true
-    }).extend({
+    }).partial().extend({
+        name: zSchema.shape.name,
+        phone: zSchema.shape.phone,
+        state: zSchema.shape.state,
+        city: zSchema.shape.city,
+        email: zSchema.shape.email.or(z.literal('')).optional(),
+        country: zSchema.shape.country.or(z.literal('')).optional(),
+        pincode: zSchema.shape.pincode.or(z.literal('')).optional(),
+        landmark: zSchema.shape.landmark.or(z.literal('')).optional(),
+        deliveryOption: z.enum(['inside', 'outside'], {
+            required_error: 'অনুগ্রহ করে ডেলিভারি চার্জের একটি অপশন নির্বাচন করুন।',
+        }),
         userId: z.string().optional()
     })
 
@@ -158,6 +195,7 @@ const Checkout = () => {
             pincode: '',
             landmark: '',
             ordernote: '',
+            deliveryOption: deliveryOption || undefined,
             userId: authStore?.auth?._id,
         }
     })
@@ -168,6 +206,10 @@ const Checkout = () => {
             orderForm.setValue('userId', authStore?.auth?._id)
         }
     }, [authStore])
+
+    useEffect(() => {
+        orderForm.setValue('deliveryOption', deliveryOption || undefined, { shouldValidate: true })
+    }, [deliveryOption])
 
     // get order id 
     const getOrderId = async (amount) => {
@@ -223,7 +265,9 @@ const Checkout = () => {
                     subtotal: subtotal,
                     discount: discount,
                     couponDiscountAmount: couponDiscountAmount,
-                    totalAmount: totalAmount
+                    totalAmount: totalAmount,
+                    deliveryOption,
+                    deliveryCharge
                 }
 
                 const result = await saveOrderToDB(orderData)
@@ -263,7 +307,9 @@ const Checkout = () => {
                                 subtotal: subtotal,
                                 discount: discount,
                                 couponDiscountAmount: couponDiscountAmount,
-                                totalAmount: totalAmount
+                                totalAmount: totalAmount,
+                                deliveryOption,
+                                deliveryCharge
                             }
 
                             const result = await saveOrderToDB(orderData)
@@ -330,6 +376,32 @@ const Checkout = () => {
                 :
                 <div className='flex lg:flex-nowrap flex-wrap gap-10 my-20 lg:px-32 px-4'>
                     <div className='lg:w-[60%] w-full'>
+                        <Form {...orderForm}>
+                            <div className='mb-6 rounded-lg border p-4'>
+                                <h3 className='font-semibold mb-1'>ডেলিভারি চার্জ নির্বাচন করুন *</h3>
+                                <p className='text-sm text-gray-500 mb-3'>অর্ডার সম্পন্ন করতে একটি অপশন নির্বাচন করুন।</p>
+                                <FormField
+                                    control={orderForm.control}
+                                    name='deliveryOption'
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <div className='grid gap-3 sm:grid-cols-2'>
+                                                {[
+                                                    ['inside', 'চুয়াডাঙ্গার ভিতরে', 40],
+                                                    ['outside', 'চুয়াডাঙ্গার বাইরে', 120],
+                                                ].map(([value, label, charge]) => (
+                                                    <label key={value} className={`flex cursor-pointer items-center justify-between rounded-md border p-3 transition-colors ${field.value === value ? 'border-black bg-gray-100' : 'border-gray-200'}`}>
+                                                        <span>{label} — {formatBDT(charge)}</span>
+                                                        <input type='radio' name={field.name} value={value} checked={field.value === value} onChange={() => { field.onChange(value); setDeliveryOption(value) }} />
+                                                    </label>
+                                                ))}
+                                            </div>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+                            </div>
+                        </Form>
                         <div className='flex font-semibold gap-2 items-center'>
                             <FaShippingFast size={25} /> Shipping Address:
                         </div>
@@ -559,6 +631,10 @@ const Checkout = () => {
                                             <td className='text-end py-2'>
                                                 -  {formatBDT(couponDiscountAmount)}
                                             </td>
+                                        </tr>
+                                        <tr>
+                                            <td className='font-medium py-2'>Delivery Charge</td>
+                                            <td className='text-end py-2'>{formatBDT(deliveryCharge)}</td>
                                         </tr>
                                         <tr>
                                             <td className='font-medium py-2 text-xl'>Total</td>
